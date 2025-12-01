@@ -1,12 +1,17 @@
 import AuthLayout from "../UI/AuthLayout";
 
-const Login = () => {
+const Forgot = () => {
   return (
     <AuthLayout>
       <div className="w-full max-w-md bg-white/20 backdrop-blur-md border-white/30  rounded-2xl shadow-xl p-8">
         <h1 className="text-3xl font-bold text-center text-white mb-6">
-          JournalNow
+          Forgot Password
         </h1>
+
+        <p className="text-white/80 text-center mb-6 text-sm">
+          Enter your email we will send you a password reset link.
+        </p>
+
         <form action="#" className="space-y-5">
           <div>
             <label className="block mb-2 text-sm font-medium text-white">
@@ -18,37 +23,19 @@ const Login = () => {
               placeholder="Enter your email"
             />
           </div>
-          <div>
-            <label className="block mb-2 text-sm font-medium text-white">
-              Password
-            </label>
-            <input
-              type="password"
-              className="w-full p-3 bg-white/40 border border-white/30 text-black placeholder-black/70 rounded-lg focus:outline-none focus:ring-1"
-              placeholder="Enter your password"
-            />
-          </div>
-          <div className="text-right">
-            <a
-              href="/forgot"
-              className="mb-4 text-sm font-medium text-white underline"
-            >
-              Forgot password?
-            </a>
-          </div>
 
           <button
             type="submit"
             className="w-full bg-blue-600/80 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer"
           >
-            Login
+            Submit
           </button>
         </form>
 
         <p className="text-center text-sm mt-4 text-white">
-          Don't have an account?{" "}
-          <a href="/register" className="underline font-medium">
-            Register
+          Back to{" "}
+          <a href="/" className="underline font-medium">
+            Login
           </a>
         </p>
       </div>
@@ -56,4 +43,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Forgot;
