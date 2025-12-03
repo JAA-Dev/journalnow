@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import BG from "../assets/images/main.jpg";
+import BG from "../assets/images/coin.jpg";
 
 interface AuthLayoutProps {
     children: ReactNode;
