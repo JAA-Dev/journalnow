@@ -12,17 +12,30 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('trades', function (Blueprint $table) {
+            // $table->id();
+            // $table->string('symbol');
+            // $table->string('tradeType');
+            // $table->string('position');
+            // $table->decimal('entry', 10, 2);
+            // $table->string('riskReward');
+            // $table->decimal('reward', 10, 2)->nullable();
+            // $table->text('reasonEntry')->nullable();
+            // $table->text('learning')->nullable();
+            // $table->decimal('stopLoss', 10, 2)->nullable();
+            // $table->decimal('takeProfit', 10, 2)->nullable();
+            // $table->string('result')->nullable();
+            // $table->timestamps();
             $table->id();
             $table->string('symbol');
             $table->string('tradeType');
             $table->string('position');
-            $table->decimal('entry', 10, 2);
+            $table->decimal('entry', 18, 8);
             $table->string('riskReward');
-            $table->decimal('reward', 10, 2)->nullable();
+            $table->decimal('reward', 18, 2)->nullable();
             $table->text('reasonEntry')->nullable();
             $table->text('learning')->nullable();
-            $table->decimal('stopLoss', 10, 2)->nullable();
-            $table->decimal('takeProfit', 10, 2)->nullable();
+            $table->decimal('stopLoss', 18, 8)->nullable();
+            $table->decimal('takeProfit', 18, 8)->nullable();
             $table->string('result')->nullable();
             $table->timestamps();
         });
