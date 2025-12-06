@@ -498,7 +498,14 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../UI/AdminLayout";
 import type { Trade } from "../../types/Trade";
 import { deleteTrade, getTrades } from "../../services/tradeService";
-import { LucideEdit, LucideTrash2, PlusSquare, X } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  LucideEdit,
+  LucideTrash2,
+  PlusSquare,
+  X,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Trade() {
@@ -509,6 +516,10 @@ export default function Trade() {
 
   const [showDelete, setShowDelete] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
+
+  const [sortBy, setSortBy] = useState<"symbol" | "tradeType" | "">("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   // FIXED SMART DECIMAL FORMATTER (STRING OR NUMBER SAFE)
   const formatSmartNumber = (value?: number | string | null) => {
@@ -531,12 +542,12 @@ export default function Trade() {
     getTrades().then((res) => setTrades(res.data));
   }, []);
 
-  const totalPages = Math.ceil(trades.length / itemsPerPage);
+  // const totalPages = Math.ceil(trades.length / itemsPerPage);
 
-  const paginatedTrades = trades.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
+  // const paginatedTrades = trades.slice(
+  //   (page - 1) * itemsPerPage,
+  //   page * itemsPerPage
+  // );
 
   const deleteSubmit = (id: number) => {
     setSelectedId(id);
@@ -552,6 +563,32 @@ export default function Trade() {
       setSelectedId(null);
     });
   };
+
+  const filteredTrades = trades.filter(
+    (trade) =>
+      trade.symbol.toLowerCase().includes(search.toLowerCase()) ||
+      trade.tradeType.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredTrades.length / itemsPerPage);
+
+  const sortedTrades = [...filteredTrades].sort((a, b) => {
+    if (!sortBy) return 0;
+
+    const valueA = a[sortBy].toString().toLowerCase();
+    const valueB = b[sortBy].toString().toLowerCase();
+
+    if (sortOrder === "asc") {
+      return valueA.localeCompare(valueB);
+    } else {
+      return valueB.localeCompare(valueA);
+    }
+  });
+
+  const paginatedTrades = sortedTrades.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
 
   return (
     <AdminLayout>
@@ -570,14 +607,77 @@ export default function Trade() {
 
         {/* TABLE */}
         <div className="w-full max-w-6xl backdrop-blur-2xl bg-white/10 border border-white/20 rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-semibold mb-4">Trade Records</h3>
+          {/*  HEADER + SEARCH (RESPONSIVE) */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <h3 className="text-xl font-semibold">Trade Records</h3>
+
+            <input
+              type="text"
+              placeholder="Search symbol or type..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="px-3 py-2 rounded bg-white/10 border border-white/20 text-sm w-full sm:w-64"
+            />
+          </div>
 
           <div className="hidden sm:block overflow-x-auto">
             <table className="min-w-max text-left text-sm mx-auto">
               <thead>
                 <tr className="border-b border-white/20 text-white/80">
-                  <th className="py-3 px-6">Symbol</th>
-                  <th className="py-3 px-6">Type</th>
+                  {/* <th className="py-3 px-6">Symbol</th>
+                  <th className="py-3 px-6">Type</th> */}
+                  <th
+                    onClick={() => {
+                      setSortBy("symbol");
+                      setSortOrder(
+                        sortBy === "symbol" && sortOrder === "asc"
+                          ? "desc"
+                          : "asc"
+                      );
+                    }}
+                    className="py-3 px-6 cursor-pointer select-none"
+                  >
+                    <div className="flex items-center gap-1">
+                      Symbol
+                      {sortBy === "symbol" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={14} />
+                        ) : (
+                          <ArrowDown size={14} />
+                        )
+                      ) : (
+                        <ArrowUp size={14} className="opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => {
+                      setSortBy("tradeType");
+                      setSortOrder(
+                        sortBy === "tradeType" && sortOrder === "asc"
+                          ? "desc"
+                          : "asc"
+                      );
+                    }}
+                    className="py-3 px-6 cursor-pointer select-none"
+                  >
+                    <div className="flex items-center gap-1">
+                      Type
+                      {sortBy === "tradeType" ? (
+                        sortOrder === "asc" ? (
+                          <ArrowUp size={14} />
+                        ) : (
+                          <ArrowDown size={14} />
+                        )
+                      ) : (
+                        <ArrowUp size={14} className="opacity-30" />
+                      )}
+                    </div>
+                  </th>
+
                   <th className="py-3 px-6">Position</th>
                   <th className="py-3 px-6">Entry</th>
                   <th className="py-3 px-6">RR</th>
@@ -590,78 +690,88 @@ export default function Trade() {
               </thead>
 
               <tbody>
-                {paginatedTrades.map((trade) => (
-                  <tr
-                    key={trade.id}
-                    className="border-b border-white/10 hover:bg-white/10 transition"
-                  >
-                    <td className="py-3 px-6">{trade.symbol}</td>
-
-                    <td
-                      className={`py-3 px-6 font-semibold ${
-                        trade.tradeType === "Long"
-                          ? "text-green-400"
-                          : "text-red-400"
-                      }`}
+                {paginatedTrades.length > 0 ? (
+                  paginatedTrades.map((trade) => (
+                    <tr
+                      key={trade.id}
+                      className="border-b border-white/10 hover:bg-white/10 transition"
                     >
-                      {trade.tradeType}
-                    </td>
+                      <td className="py-3 px-6">{trade.symbol}</td>
 
-                    <td className="py-3 px-6">{trade.position}</td>
-                    <td className="py-3 px-6">
-                      {formatSmartNumber(trade.entry)}
-                    </td>
-                    <td className="py-3 px-6">{trade.riskReward}</td>
-
-                    {/* ✅ ✅ ✅ FIXED REWARD DISPLAY */}
-                    <td
-                      className={`py-3 px-6 font-semibold ${
-                        Number(trade.reward) > 0
-                          ? "text-green-400"
-                          : Number(trade.reward) < 0
-                          ? "text-red-400"
-                          : "text-white"
-                      }`}
-                    >
-                      {formatSmartNumber(trade.reward)}
-                    </td>
-
-                    <td className="py-3 px-6">
-                      {formatSmartNumber(trade.stopLoss)}
-                    </td>
-                    <td className="py-3 px-6">
-                      {formatSmartNumber(trade.takeProfit)}
-                    </td>
-
-                    <td
-                      className={`py-3 px-6 font-semibold ${
-                        trade.result === "Win"
-                          ? "text-green-400"
-                          : trade.result === "Lose"
-                          ? "text-red-400"
-                          : "text-white"
-                      }`}
-                    >
-                      {trade.result}
-                    </td>
-
-                    <td className="py-3 px-6 flex flex-row gap-2">
-                      <Link
-                        to={`/trade/edit/${trade.id}`}
-                        className="text-blue-300 hover:underline"
+                      <td
+                        className={`py-3 px-6 font-semibold ${
+                          trade.tradeType === "Long"
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}
                       >
-                        <LucideEdit />
-                      </Link>
+                        {trade.tradeType}
+                      </td>
 
-                      <button
-                        onClick={() => deleteSubmit(trade.id)}
-                        className="text-red-300 hover:underline cursor-pointer"
+                      <td className="py-3 px-6">{trade.position}</td>
+                      <td className="py-3 px-6">
+                        {formatSmartNumber(trade.entry)}
+                      </td>
+                      <td className="py-3 px-6">{trade.riskReward}</td>
+
+                      <td
+                        className={`py-3 px-6 font-semibold ${
+                          Number(trade.reward) > 0
+                            ? "text-green-400"
+                            : Number(trade.reward) < 0
+                            ? "text-red-400"
+                            : "text-white"
+                        }`}
                       >
-                        <LucideTrash2 />
-                      </button>
+                        {formatSmartNumber(trade.reward)}
+                      </td>
+
+                      <td className="py-3 px-6">
+                        {formatSmartNumber(trade.stopLoss)}
+                      </td>
+                      <td className="py-3 px-6">
+                        {formatSmartNumber(trade.takeProfit)}
+                      </td>
+
+                      <td
+                        className={`py-3 px-6 font-semibold ${
+                          trade.result === "Win"
+                            ? "text-green-400"
+                            : trade.result === "Lose"
+                            ? "text-red-400"
+                            : "text-white"
+                        }`}
+                      >
+                        {trade.result}
+                      </td>
+
+                      <td className="py-3 px-6 flex flex-row gap-2">
+                        <Link
+                          to={`/trade/edit/${trade.id}`}
+                          className="text-blue-300 hover:underline"
+                        >
+                          <LucideEdit />
+                        </Link>
+
+                        <button
+                          onClick={() => deleteSubmit(trade.id)}
+                          className="text-red-300 hover:underline cursor-pointer"
+                        >
+                          <LucideTrash2 />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={10}
+                      className="text-center py-8 text-white/60 italic"
+                    >
+                      No trades found.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
@@ -801,7 +911,10 @@ export default function Trade() {
           <div className="bg-white/10 border border-white/20 backdrop-blur-xl rounded-xl shadow-lg p-6 w-full max-w-sm text-center">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold">Delete Trade</h3>
-              <button onClick={() => setShowDelete(false)} className="cursor-pointer">
+              <button
+                onClick={() => setShowDelete(false)}
+                className="cursor-pointer"
+              >
                 <X />
               </button>
             </div>

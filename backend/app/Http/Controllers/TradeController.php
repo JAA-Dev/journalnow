@@ -25,7 +25,8 @@ class TradeController extends Controller
             'stopLoss',
             'takeProfit',
             'result'
-        ])->get();
+        ])->orderBy('id', 'desc') //para naka desc order na
+        ->get();
         return response()->json($trade);
 
         // return response()->json(['message' => 'List of trade will be displayed here']);

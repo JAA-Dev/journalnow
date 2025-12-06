@@ -280,9 +280,10 @@ export default function TradeEdit() {
       getTrade(id).then((res) => {
         setSymbol(res.data.symbol);
         setType(res.data.tradeType);
-        setPosition(res.data.position);
+        // setPosition(res.data.position);
+        setPosition(res.data.position?.toString() || "");
 
-        // ✅ Convert numbers to string safely
+        // Convert numbers to string safely
         setEntry(res.data.entry?.toString() || "");
         setRR(res.data.riskReward);
         setReason(res.data.reasonEntry || "");
@@ -301,7 +302,8 @@ export default function TradeEdit() {
     updateTrade(id, {
       symbol,
       tradeType: type,
-      position,
+      // position,
+      position: position ? Number(position) : null,
       entry: Number(entry),
       riskReward: rr,
 
@@ -376,7 +378,7 @@ export default function TradeEdit() {
             <div className="flex flex-col">
               <label className="font-semibold">Position</label>
               <input
-                type="text"
+                type="number"
                 value={position}
                 onChange={(e) => setPosition(e.target.value)}
                 placeholder="Position size"

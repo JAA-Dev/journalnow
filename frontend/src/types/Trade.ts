@@ -19,7 +19,7 @@ export interface Trade {
 
   symbol: string;        // ticker
   tradeType: string;     // BUY / SELL / LONG / SHORT
-  position: string;      // position size or type
+  position: number;      // position size or type
   entry: number;         // entry price
   riskReward: string;    // e.g. "1:2"
   reasonEntry: string;   // bakit pumasok

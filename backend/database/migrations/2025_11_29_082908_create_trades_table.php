@@ -28,7 +28,8 @@ return new class extends Migration
             $table->id();
             $table->string('symbol');
             $table->string('tradeType');
-            $table->string('position');
+            // $table->string('position');
+            $table->decimal('position', 18, 2)->change();
             $table->decimal('entry', 18, 8);
             $table->string('riskReward');
             $table->decimal('reward', 18, 2)->nullable();

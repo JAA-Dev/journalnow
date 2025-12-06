@@ -283,7 +283,8 @@ export default function TradeCreate() {
     createTrade({
       symbol,
       tradeType: type,
-      position,
+      // position,
+      position: position ? Number(position) : null,
       entry: Number(entry),
       riskReward: rr,
 
