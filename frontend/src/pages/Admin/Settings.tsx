@@ -8,13 +8,24 @@
 //   );
 // }
 
-
+import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../UI/AdminLayout";
 import { useState } from "react";
+import { profile } from "../../services/authService";
 
 export default function Settings() {
-  const [avatar, setAvatar] = useState<string>("https://ui-avatars.com/api/?name=User");
+  const [avatar, setAvatar] = useState<string>(
+    "https://ui-avatars.com/api/?name=User"
+  );
   const [preview, setPreview] = useState<string>("");
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState([]);
+  const navigate = useNavigate();
 
   // Handle Avatar Upload
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,15 +36,38 @@ export default function Settings() {
     setPreview(url);
   };
 
+  const detailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors([]);
+    profile(
+      {
+        name: name,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+      },
+      user.token
+    ).then((res) => {
+      if (res.data.errors) {
+        setErrors(res.data.errors);
+      } else {
+        localStorage.setItem("user", JSON.stringify({
+          ...user,
+          name: res.data.name,
+          email: res.data.email
+        }));
+
+        navigate("/settings");
+      }
+    });
+  };
+
   return (
     <AdminLayout>
       <h2 className="text-3xl font-bold mb-6">Settings</h2>
 
       <div className="max-w-3xl mx-auto space-y-10">
-
-        {/* =============================== */}
         {/* CHANGE AVATAR */}
-        {/* =============================== */}
         <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-xl">
           <h3 className="text-xl font-semibold mb-4">Change Avatar</h3>
 
@@ -60,7 +94,7 @@ export default function Settings() {
 
               {preview && (
                 <button
-                  className="block mt-3 px-4 py-2 bg-green-500/20 text-green-300 rounded-lg hover:bg-green-500/30"
+                  className="block mt-3 px-4 py-2 bg-green-500/20 text-green-300 rounded-lg hover:bg-green-500/30 cursor-pointer"
                   onClick={() => {
                     setAvatar(preview);
                     setPreview("");
@@ -73,80 +107,76 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* =============================== */}
         {/* PROFILE DETAILS */}
-        {/* =============================== */}
         <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-xl">
           <h3 className="text-xl font-semibold mb-4">Profile Details</h3>
-
-          <form className="space-y-4">
+          {/* display errors */}
+          {errors.length > 0 && (
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative w-80"
+              role="alert"
+            >
+              <strong className="font-bold">Error!</strong>
+              <ul className="list-disc list-inside">
+                {errors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <form onSubmit={detailSubmit} className="space-y-4">
+            {/* NAME */}
             <div>
               <label className="block mb-1">Full Name</label>
               <input
                 type="text"
-                placeholder="Enter your full name"
-                className="w-full p-3 rounded-lg bg-white/20 border border-white/10 outline-none placeholder-gray-300"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full p-3 rounded-lg bg-white/20 border border-white/10"
               />
             </div>
 
+            {/* EMAIL */}
             <div>
               <label className="block mb-1">Email</label>
               <input
                 type="email"
-                placeholder="Enter your email"
-                className="w-full p-3 rounded-lg bg-white/20 border border-white/10 outline-none placeholder-gray-300"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full p-3 rounded-lg bg-white/20 border border-white/10"
               />
             </div>
 
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30"
-            >
-              Save Changes
-            </button>
-          </form>
-        </div>
-
-        {/* =============================== */}
-        {/* CHANGE PASSWORD */}
-        {/* =============================== */}
-        <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-xl">
-          <h3 className="text-xl font-semibold mb-4">Change Password</h3>
-
-          <form className="space-y-4">
-            <div>
-              <label className="block mb-1">Current Password</label>
-              <input
-                type="password"
-                placeholder="Enter current password"
-                className="w-full p-3 rounded-lg bg-white/20 border border-white/10 outline-none placeholder-gray-300"
-              />
-            </div>
-
+            {/* PASSWORD */}
             <div>
               <label className="block mb-1">New Password</label>
               <input
                 type="password"
-                placeholder="Enter new password"
-                className="w-full p-3 rounded-lg bg-white/20 border border-white/10 outline-none placeholder-gray-300"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-3 rounded-lg bg-white/20 border border-white/10"
               />
             </div>
 
+            {/* CONFIRM */}
             <div>
               <label className="block mb-1">Confirm Password</label>
               <input
                 type="password"
-                placeholder="Confirm new password"
-                className="w-full p-3 rounded-lg bg-white/20 border border-white/10 outline-none placeholder-gray-300"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full p-3 rounded-lg bg-white/20 border border-white/10"
               />
             </div>
 
-            <button
-              type="submit"
-              className="px-6 py-2 bg-green-500/20 text-green-300 rounded-lg hover:bg-green-500/30"
-            >
-              Update Password
-            </button>
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="px-6 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 cursor-pointer"
+              >
+                Save All Changes
+              </button>
+            </div>
           </form>
         </div>
       </div>

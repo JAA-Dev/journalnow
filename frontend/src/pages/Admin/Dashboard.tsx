@@ -91,6 +91,10 @@ import AdminLayout from "../../UI/AdminLayout";
 import { getTrades } from "../../services/tradeService";
 
 export default function Dashboard() {
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  // console.log(user);
+
   const [stats, setStats] = useState({
     totalTrades: 0,
     winRate: 0,
@@ -142,6 +146,7 @@ export default function Dashboard() {
   return (
     <AdminLayout>
       <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
+      <h2 className="text-lg font-bold mb-6">Welcome back {user.name}</h2>
 
       {/* ✅ STATS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
@@ -197,7 +202,7 @@ export default function Dashboard() {
                     : "text-red-400"
                 }`}
               >
-                {trade.reward > 0 ? "+" : "-"}₱
+                {trade.reward > 0 ? "+" : "-"}$
                 {Math.abs(Number(trade.reward))}
               </p>
             </div>

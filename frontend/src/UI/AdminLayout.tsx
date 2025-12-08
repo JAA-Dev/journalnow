@@ -1,5 +1,5 @@
 import { type ReactNode, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Menu,
   X,
@@ -19,7 +19,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [open, setOpen] = useState(true);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [dropdown, setDropdown] = useState(false);
+  const navigate = useNavigate();
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const logout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    navigate('/');
+  }
   return (
     <div
       className="relative flex min-h-screen bg-cover bg-center bg-no-repeat text-white"
@@ -146,6 +154,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   src="https://ui-avatars.com/api/?name=Admin"
                   className="w-8 h-8 rounded-full border border-white/20"
                 />
+                <h3 className="font-bold">{user.name}</h3>
               </button>
 
               {dropdown && (
@@ -164,11 +173,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     <Settings size={18} /> Settings
                   </Link>
 
-                  <button
-                    className="flex items-center gap-2 w-full text-left px-3 py-2 rounded hover:bg-white/20 text-red-300"
+                  <a onClick={logout}
+                    className="flex items-center gap-2 w-full text-left px-3 py-2 rounded hover:bg-white/20 text-red-300 cursor-pointer"
                   >
                     <LogOut size={18} /> Logout
-                  </button>
+                  </a>
                 </div>
               )}
             </div>

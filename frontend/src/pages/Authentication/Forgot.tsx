@@ -1,4 +1,4 @@
-import AuthLayout from "../UI/AuthLayout";
+import AuthLayout from "../../UI/AuthLayout";
 
 const Forgot = () => {
   return (

@@ -1,7 +1,7 @@
-import { Route, Routes } from "react-router-dom"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import ForgotP from "./pages/Forgot"
+import { Route, Routes, useLocation } from "react-router-dom"
+import Login from "./pages/Authentication/Login"
+import Register from "./pages/Authentication/Register"
+import ForgotP from "./pages/Authentication/Forgot"
 import NotFound404 from "./pages/NotFound404"
 import Dashboard from "./pages/Admin/Dashboard"
 import Trade from "./pages/Admin/Trade"
@@ -9,8 +9,17 @@ import Calendar from "./pages/Admin/Calendar"
 import Settings from "./pages/Admin/Settings"
 import CreateTrade from "./pages/Admin/TradeCreate"
 import EditTrade from "./pages/Admin/TradeEdit"
+import { useEffect, useState } from "react"
 
 function App() {
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const auth = localStorage.getItem('isAuthenticated');
+    setIsAuthenticated(auth === 'true');
+  }, [location]);
 
   return (
     <>
@@ -21,12 +30,16 @@ function App() {
         <Route path="/forgot" element={<ForgotP />} />
 
         {/* admin */}
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/trade" element={<Trade />} />
-        <Route path="/trade/create" element={<CreateTrade />} />
-        <Route path="/trade/edit/:id" element={<EditTrade/>} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/settings" element={<Settings />} />
+        {isAuthenticated && (
+          <>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/trade" element={<Trade />} />
+            <Route path="/trade/create" element={<CreateTrade />} />
+            <Route path="/trade/edit/:id" element={<EditTrade/>} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/settings" element={<Settings />} />
+          </>
+        )}
 
 
         {/* 404 page */}
