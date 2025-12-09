@@ -10,6 +10,7 @@ import {
   NotebookTextIcon,
 } from "lucide-react";
 import BG from "../assets/images/line.jpg";
+import { toast } from "react-toastify";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -20,13 +21,27 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [dropdown, setDropdown] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user"));
 
   const logout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('isAuthenticated');
-    navigate('/');
+    // localStorage.removeItem('user');
+    // localStorage.removeItem('isAuthenticated');
+    // navigate('/');
+
+    setLoading(true);
+
+    toast.info("Logging out...", { autoClose: 1000 });
+
+    setTimeout(() => {
+      localStorage.removeItem("user");
+      localStorage.removeItem("isAuthenticated");
+
+      toast.success("Logged out successfully!");
+
+      setTimeout(() => navigate("/"), 1000);
+    }, 1000);
   }
   return (
     <div
@@ -176,6 +191,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <a onClick={logout}
                     className="flex items-center gap-2 w-full text-left px-3 py-2 rounded hover:bg-white/20 text-red-300 cursor-pointer"
                   >
+
+                    {loading && (
+                      <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
+                    )}
                     <LogOut size={18} /> Logout
                   </a>
                 </div>

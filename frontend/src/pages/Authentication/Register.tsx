@@ -2,6 +2,7 @@ import { useState } from "react";
 import AuthLayout from "../../UI/AuthLayout";
 import { register } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -10,10 +11,14 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrors([]);
+
+    setLoading(true);
+    toast.info("Creating account...", { autoClose: 1000 });
     // alert(name + email + password + confirmPassword);
     register({
       name: name,
@@ -24,14 +29,24 @@ const Register = () => {
       // console.log(res.data);
       if (res.data.errors) {
         setErrors(res.data.errors);
+        toast.error("Registration failed");
       }
       else{
-        localStorage.setItem('user', JSON.stringify(res.data));
-        localStorage.setItem('isAuthenticated', true);
+        // localStorage.setItem('user', JSON.stringify(res.data));
+        // localStorage.setItem('isAuthenticated', true);
 
-        navigate('/');
+        // navigate('/');
+        toast.success("Account created successfully!");
+
+          setTimeout(() => {
+            navigate("/");
+          }, 1200);
       }
-    });
+    })
+    .catch(() => {
+        setLoading(false);
+        toast.error("Server error. Please try again.");
+      });
   };
 
   return (
@@ -105,9 +120,14 @@ const Register = () => {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full bg-blue-600/80 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer"
           >
-            Register
+            {/* Register */}
+            {loading && (
+              <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
+            )}
+            {loading ? "Creating..." : "Register"}
           </button>
         </form>
 

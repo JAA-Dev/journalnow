@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../UI/AdminLayout";
 import { useState } from "react";
 import { profile } from "../../services/authService";
+import { toast } from "react-toastify";
 
 export default function Settings() {
   const [avatar, setAvatar] = useState<string>(
@@ -26,6 +27,7 @@ export default function Settings() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   // Handle Avatar Upload
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +41,7 @@ export default function Settings() {
   const detailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrors([]);
+    setLoading(true);
     profile(
       {
         name: name,
@@ -50,6 +53,7 @@ export default function Settings() {
     ).then((res) => {
       if (res.data.errors) {
         setErrors(res.data.errors);
+        toast.error("Error updating profile!");
       } else {
         localStorage.setItem("user", JSON.stringify({
           ...user,
@@ -57,9 +61,11 @@ export default function Settings() {
           email: res.data.email
         }));
 
+        // navigate("/settings");
+        toast.success("Profile updated successfully!");
         navigate("/settings");
       }
-    });
+    }).finally(() => setLoading(false));
   };
 
   return (
@@ -172,9 +178,11 @@ export default function Settings() {
             <div className="flex justify-end">
               <button
                 type="submit"
+                disabled={loading}
                 className="px-6 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 cursor-pointer"
               >
-                Save All Changes
+                {/* Save All Changes */}
+                {loading ? "Updating..." : "Save All Changes"}
               </button>
             </div>
           </form>
