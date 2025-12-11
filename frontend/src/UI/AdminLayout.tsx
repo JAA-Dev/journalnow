@@ -26,10 +26,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const logout = () => {
-    // localStorage.removeItem('user');
-    // localStorage.removeItem('isAuthenticated');
-    // navigate('/');
-
     setLoading(true);
 
     toast.info("Logging out...", { autoClose: 1000 });
@@ -42,7 +38,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       setTimeout(() => navigate("/"), 1000);
     }, 1000);
-  }
+  };
+
   return (
     <div
       className="relative flex min-h-screen bg-cover bg-center bg-no-repeat text-white"
@@ -98,13 +95,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           />
         )}
 
-        {/* DESKTOP SIDEBAR (FULL GLASS) */}
+        {/* DESKTOP SIDEBAR (FIXED LEFT) */}
         <div
           className={`hidden lg:flex flex-col p-4
-          bg-white/10 backdrop-blur-2xl border-r border-white/20 
-          shadow-xl 
-          transition-all duration-300
-          ${open ? "w-55" : "w-20"}`}
+            fixed left-0 top-0 h-screen
+            bg-white/10 backdrop-blur-2xl border-r border-white/20 
+            shadow-xl z-40
+            transition-all duration-300
+            ${open ? "w-55" : "w-20"}`}
         >
           <button
             className="mb-6 text-gray-300 hover:text-white"
@@ -137,16 +135,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
 
         {/* MAIN CONTENT */}
-        <div className="flex-1 flex flex-col">
-
-          {/* FULL GLASS NAVBAR */}
+        <div
+          className="flex-1 flex flex-col transition-all duration-300"
+          style={{
+            marginLeft: open ? "220px" : "80px", // matches w-55 and w-20
+          }}
+        >
+          {/* NAVBAR */}
           <div
             className="
               sticky top-0 z-30
               bg-white/10 backdrop-blur-2xl
               border-b border-white/20 shadow-xl
               p-4 flex justify-between items-center
-              
             "
           >
             {/* MOBILE MENU */}
@@ -188,10 +189,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     <Settings size={18} /> Settings
                   </Link>
 
-                  <a onClick={logout}
+                  <a
+                    onClick={logout}
                     className="flex items-center gap-2 w-full text-left px-3 py-2 rounded hover:bg-white/20 text-red-300 cursor-pointer"
                   >
-
                     {loading && (
                       <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
                     )}
@@ -203,10 +204,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           {/* PAGE CONTENT */}
-          <main className="p-6 flex-1 overflow-y-auto">
-            {children}
-          </main>
-
+          <main className="p-6 flex-1 overflow-y-auto">{children}</main>
         </div>
       </div>
     </div>
